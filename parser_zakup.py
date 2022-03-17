@@ -133,8 +133,8 @@ for organization in organization_bins[:1]:
                 end_date = header_inputs[-1].get('value')
 
                 appear_body = appear_soup.find('div', 'tab-content').table.find_all('tr')
-                subject_type = appear_body[2].td.text
-                buying_method = appear_body[0].td.text
+                subject_type = appear_body[2].td.text.strip()
+                buying_method = appear_body[0].td.text.strip()
 
                 lots_url = appear_soup.find('ul', 'nav-tabs').find_all('li')
                 lots_url = lots_url[1].a.get('href')
@@ -171,7 +171,7 @@ for organization in organization_bins[:1]:
                         rows_number += 1
                         print('rows_number = ' + str(rows_number))
                         nid_lot = lot.a.get('data-lot-id')
-                        lot_status = lot.find_all('td')[-2].text
+                        lot_status = lot.find_all('td')[-2].text.strip()
                         # print(lot_status)
                         # response = requests.get(url_base + columns[1].a['href'] + lots_url + lot_url, verify=False)
                         # lot_html = response.text
@@ -194,23 +194,23 @@ for organization in organization_bins[:1]:
                             # elif row.th.text == 'Дата окончания приема заявок':
                             #     end_date = row.td.text
                             if row.th.text == 'Код ТРУ':
-                                tru_code = row.td.text
+                                tru_code = row.td.text.strip()
                             elif row.th.text == 'Лот №':
-                                id_lot = row.td.text
+                                id_lot = row.td.text.strip()
                             elif row.th.text == 'Наименование ТРУ':
-                                tru_name = row.td.text
+                                tru_name = row.td.text.strip()
                             elif row.th.text == 'Краткая характеристика':
-                                short_tech_character = row.td.text
+                                short_tech_character = row.td.text.strip()
                             elif row.th.text == 'Дополнительная характеристика':
-                                extra_character = row.td.text
+                                extra_character = row.td.text.strip()
                             elif row.th.text == 'Цена за единицу':
-                                one_price = row.td.text
+                                one_price = row.td.text.strip()
                             elif row.th.text == 'Количество':
-                                count = row.td.text
+                                count = row.td.text.strip()
                             elif row.th.text == 'Запланированная сумма':
-                                total_amount = row.td.text
+                                total_amount = row.td.text.strip()
                             elif row.th.text == 'Срок поставки ТРУ':
-                                plan_time_of_delivery = row.td.text
+                                plan_time_of_delivery = row.td.text.strip()
 
                         lot_row = [rows_number, id_appear, id_lot, id_plan, subject_type, tru_code, tru_name, extra_character,
                                               short_tech_character, count, one_price, total_amount, one_price_without_NDS,
@@ -244,7 +244,7 @@ for organization in organization_bins[:1]:
                         print('rows_number = ' + str(rows_number))
                         nid_lot = lot.a.get('data-lot-id')
                         temp_lot_row = lot.find_all('td')
-                        lot_status = temp_lot_row[-2].text
+                        lot_status = temp_lot_row[-2].text.strip()
                         id_plan = temp_lot_row[1].text.strip()
                         # print(lot_status)
                         # response = requests.get(url_base + columns[1].a['href'] + lots_url + lot_url, verify=False)
@@ -268,23 +268,23 @@ for organization in organization_bins[:1]:
                             # elif row.th.text == 'Дата окончания приема заявок':
                             #     end_date = row.td.text
                             if row.th.text == 'Код ТРУ':
-                                tru_code = row.td.text
+                                tru_code = row.td.text.strip()
                             elif row.th.text == 'Лот №':
-                                id_lot = row.td.text
+                                id_lot = row.td.text.strip()
                             elif row.th.text == 'Наименование ТРУ':
-                                tru_name = row.td.text
+                                tru_name = row.td.text.strip()
                             elif row.th.text == 'Краткая характеристика':
-                                short_tech_character = row.td.text
+                                short_tech_character = row.td.text.strip()
                             elif row.th.text == 'Дополнительная характеристика':
-                                extra_character = row.td.text
+                                extra_character = row.td.text.strip()
                             elif row.th.text == 'Цена за единицу':
-                                one_price = row.td.text
+                                one_price = row.td.text.strip()
                             elif row.th.text == 'Количество':
-                                count = row.td.text
+                                count = row.td.text.strip()
                             elif row.th.text == 'Запланированная сумма':
-                                total_amount = row.td.text
+                                total_amount = row.td.text.strip()
                             elif row.th.text == 'Срок поставки ТРУ':
-                                plan_time_of_delivery = row.td.text
+                                plan_time_of_delivery = row.td.text.strip()
 
                         lot_row = [rows_number, id_appear, id_lot, id_plan, subject_type, tru_code, tru_name, extra_character,
                                               short_tech_character, count, one_price, total_amount, one_price_without_NDS,
