@@ -4,7 +4,7 @@ import time
 import csv
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
-
+import re
 
 
 url = "https://www.goszakup.gov.kz/ru/search/announce?count_record=50&filter%5Bstatus%5D%5B0%5D=350&filter%5Bcustomer%5D="
@@ -103,6 +103,7 @@ for organization in organization_bins[:1]:
         file_writer.writerow([i for i in range(1, 24)])
         for page in range(1, pages+1):
             print('page = ' + str(page))
+            appear_number = 0
             time.sleep(1)
             response = requests.get(url+organization+'&page='+str(page), verify=False)
             html = response.text
@@ -110,6 +111,8 @@ for organization in organization_bins[:1]:
             table = soup.find('table', id='search-result').tbody
             # print(table)
             for table_row in table.find_all('tr'):
+                appear_number += 1
+                print('appear number = ' + str(appear_number))
                 buying_method = ''
                 subject_type = ''
                 start_date = ''
@@ -122,7 +125,7 @@ for organization in organization_bins[:1]:
 
                 # lot_status = columns[-1].text
 
-                time.sleep(1)
+                time.sleep(2)
                 response = requests.get(url_base+columns[1].a['href'], verify=False)
                 appear_html = response.text
                 appear_soup = BeautifulSoup(appear_html, 'html.parser')
@@ -139,7 +142,7 @@ for organization in organization_bins[:1]:
                 lots_url = appear_soup.find('ul', 'nav-tabs').find_all('li')
                 lots_url = lots_url[1].a.get('href')
 
-                time.sleep(1)
+                time.sleep(2)
                 response = requests.get(url_base+columns[1].a['href']+lots_url, verify=False)
                 lots_html = response.text
                 lots_soup = BeautifulSoup(lots_html, 'html.parser')
@@ -179,7 +182,7 @@ for organization in organization_bins[:1]:
                         # lot_body = lot_soup.find('div', 'modal-lot-content').table.find_all('tr')
                         # print(lot_body)
                         try:
-                            time.sleep(1)
+                            time.sleep(2)
                             driver.get(url_base + columns[1].a['href'] + lots_url)
                             driver.find_element_by_xpath(f"//a[@data-lot-id='{nid_lot}']").click()
                             wait = WebDriverWait(driver, timeout=5)
@@ -199,10 +202,13 @@ for organization in organization_bins[:1]:
                                 id_lot = row.td.text.strip()
                             elif row.th.text == 'Наименование ТРУ':
                                 tru_name = row.td.text.strip()
+                                tru_name = re.sub(r'\s+', ' ', tru_name)
                             elif row.th.text == 'Краткая характеристика':
                                 short_tech_character = row.td.text.strip()
+                                short_tech_character = re.sub(r'\s+', ' ', short_tech_character)
                             elif row.th.text == 'Дополнительная характеристика':
                                 extra_character = row.td.text.strip()
+                                extra_character = re.sub(r'\s+', ' ', extra_character)
                             elif row.th.text == 'Цена за единицу':
                                 one_price = row.td.text.strip()
                             elif row.th.text == 'Количество':
@@ -253,7 +259,7 @@ for organization in organization_bins[:1]:
                         # lot_body = lot_soup.find('div', 'modal-lot-content').table.find_all('tr')
                         # print(lot_body)
                         try:
-                            time.sleep(1)
+                            time.sleep(2)
                             driver.get(url_base + columns[1].a['href'] + lots_url)
                             driver.find_element_by_xpath(f"//a[@data-lot-id='{nid_lot}']").click()
                             wait = WebDriverWait(driver, timeout=5)
@@ -273,10 +279,13 @@ for organization in organization_bins[:1]:
                                 id_lot = row.td.text.strip()
                             elif row.th.text == 'Наименование ТРУ':
                                 tru_name = row.td.text.strip()
+                                tru_name = re.sub(r'\s+', ' ', tru_name)
                             elif row.th.text == 'Краткая характеристика':
                                 short_tech_character = row.td.text.strip()
+                                short_tech_character = re.sub(r'\s+', ' ', short_tech_character)
                             elif row.th.text == 'Дополнительная характеристика':
                                 extra_character = row.td.text.strip()
+                                extra_character = re.sub(r'\s+', ' ', extra_character)
                             elif row.th.text == 'Цена за единицу':
                                 one_price = row.td.text.strip()
                             elif row.th.text == 'Количество':
