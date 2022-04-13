@@ -7,7 +7,7 @@ import re
 
 url = "https://www.goszakup.gov.kz/ru/search/announce?count_record=50&filter%5Bstatus%5D%5B0%5D=350&filter%5Bcustomer%5D="
 url_base = "https://www.goszakup.gov.kz"
-organization_bins = ['081140019556', '000740001307', '990740002243',
+organization_bins = ['970940001378', '081140019556', '000740001307', '990740002243',
                      '940740000911',
                      '960440000220',
                      '110340001853',
@@ -24,7 +24,8 @@ organization_bins = ['081140019556', '000740001307', '990740002243',
                     ]
 
 
-for organization in organization_bins[4:]:
+for organization in organization_bins[:1
+                    ]:
     # вытащить количество страниц
     time.sleep(2)
     response = requests.get(url + organization, verify=False)
