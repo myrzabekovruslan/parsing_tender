@@ -28,7 +28,7 @@ headers["Content-Type"] = "application/json"
 #     print(err)
 year = True
 
-for dd in range(1, 2):
+for dd in range(2, 3):
     with open(f"{dd}.csv", mode="w", encoding='utf-8') as w_file:
         file_writer = csv.writer(w_file, delimiter=";",
                                  lineterminator="\r")
@@ -38,7 +38,7 @@ for dd in range(1, 2):
 
         try:
             # for x in range((dd-1)*3000 +1, dd*3000): #55509
-            for x in range(1, 100): #55509
+            for x in range(501, 600): #55509
                 try:
                     PARAMS = {'limit': 500, 'page' : x}
 
