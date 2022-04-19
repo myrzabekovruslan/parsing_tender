@@ -20,6 +20,76 @@ headers["Content-Type"] = "application/json"
 
 contract_page_cnt = 1
 
+# year_2022 = True
+#
+# for x in range(1, contract_page_cnt+1):
+#     if year_2022:
+#         params = {'limit': 500, 'page' : x}
+#         r = requests.get(url=CONTRACT_URL, params=params, headers=headers, verify=False)
+#         data = r.json()
+#         data = data['items']
+#         for contract in data:
+#             if year_2022:
+#                 contract_detail_response = requests.get(
+#                     CONTRACT_URL+str(contract.get('id')),
+#                     params={
+#                         'fin_year': 2022,
+#                     },
+#                     headers=headers,
+#                     verify=False,
+#                 )
+#                 contract_detail_data = contract_detail_response.json()
+#                 if contract_detail_data.get('fin_year') != 2022:
+#                     print('no 2022')
+
+trade_methods = {
+    2: 'Открытый конкурс',
+    3: 'Запрос ценовых предложений',
+    32: 'Конкурс с предварительным квалификационным отбором',
+    60: 'Электронный магазин',
+}
+
+exclude_bin = (
+    '900640000128',
+    '970940001378',
+    '050840004139',
+    '000740001307',
+    '990740002243',
+    '940740000911',
+    '960440000220',
+    '110340001853',
+    '020440003656',
+    '971040001050',
+    '050740004819',
+    '051040005150',
+    '100140011059',
+    '150540000186',
+    '000540000463',
+    '120940001946',
+    '780140000023',
+    '990340005977',
+    '171041003124',
+    '960640000535',
+    '940940000384',
+    '210240019348',
+    '980440001034',
+    '030440003698',
+    '180740010700',
+)
+
+# try:
+#     r = requests.get(
+#         "https://ows.goszakup.gov.kz/v3/refs/ref_pln_point_status",
+#         headers=headers,
+#         params={'limit': 500, },
+#         verify=False
+#     )
+#     print(r.json())
+#     for i in r.json().get('items'):
+#         print(i)
+# except:
+#     pass
+
 try:
     r = requests.get(
         CONTRACT_URL,
@@ -37,12 +107,12 @@ try:
         print(data)
         print('contract page count: ', contract_page_cnt)
 
-    year_2022 = True
 
     with open(f"contracts.csv", mode="w", encoding='utf-8') as w_file:
         file_writer = csv.writer(w_file, delimiter=";",
                                  lineterminator="\r")
-        file_writer.writerow(['ID договора', 'ID Объявления', 'Номер объявления', 'Статус', 'ИД Поставщика',
+        file_writer.writerow(['ID договора', 'ID Объявления', 'Номер объявления', 'Статус плана',
+                              'Способ закупки', 'ИД Поставщика',
                               'БИН/ИИН Поставщика', 'Наименование подтверждающего документа',
                               'Дата подтверждающего документа', 'Дата подведения итогов госзакупок',
                               'ИД заказчика ТРУ', 'БИН заказчика ТРУ', 'Номер договора в системе',
@@ -53,64 +123,66 @@ try:
                               'Описание на русском языке', 'Фактический способ закупки', 'Юридический адрес заказчика',
                               'Номер лота', 'Наименование на русском языке', 'Наименование на государственном языке',
                               'Детальное описание на русском языке', 'Детальное описание на государственном языке',
-                              'БИН заказчика', 'ИД Способа закупки', 'ИД пункта плана', 'Номер акта',
+                              'БИН заказчика', 'ИД пункта плана', 'Номер акта',
                               'Код способа закупки(плановый)', 'Код единицы измерения', 'Количество / объем',
                               'Цена за единицу', 'Общая сумма, утвержденная для закупки',
                               'Краткая характеристика на русском языке', 'Краткая характеристика на казахском языке',
                               'Дополнительное описание на русском языке', 'Дополнительное описание на казахском языке',
                               'ID КАТО', 'Полный адрес поставки на русском языке',
-                              'Полный адрес поставки на казахском языке',
+                              'Полный'
+                              ' адрес поставки на казахском языке',
                               ])
 
         for x in range(1, contract_page_cnt+1):
-            if year_2022:
-                while True:
-                    try:
-                        params = {'limit': 500, 'page' : x}
-                        r = requests.get(url=CONTRACT_URL, params=params, headers=headers, verify=False)
+            while True:
+                try:
+                    params = {'limit': 500, 'page': x}
+                    r = requests.get(url=CONTRACT_URL, params=params, headers=headers, verify=False)
+                    data = r.json()
+                    data = data['items']
 
-                        data = r.json()
-                        data = data['items']
-                        for contract in data:
-                            if year_2022:
-                                while True:
-                                    try:
-                                        contract_detail_response = requests.get(CONTRACT_URL+str(contract.get('id')), headers=headers, verify=False,)
-                                        contract_detail_data = contract_detail_response.json()
-                                        if contract_detail_data.get('fin_year') == 2022:
-                                            while True:
-                                                try:
-                                                    if contract_detail_data.get('trd_buy_number_anno'):
-                                                        lots_response = requests.get(LOTS_URL+contract_detail_data.get('trd_buy_number_anno'), params={'limit': 500, }, headers=headers, verify=False,)
-                                                        lots_data = lots_response.json()
-                                                        if lots_data.get('total') % lots_data.get('limit') == 0:
-                                                            lots_page_cnt = lots_data.get('total') // lots_data.get('limit')
-                                                        else:
-                                                            lots_page_cnt = lots_data.get('total') // lots_data.get(
-                                                                'limit') + 1
+                    for contract in data:
+                        if contract.get('customer_bin') not in exclude_bin:
+                            while True:
+                                try:
+                                    contract_detail_response = requests.get(CONTRACT_URL+str(contract.get('id')), headers=headers, verify=False,)
+                                    contract_detail_data = contract_detail_response.json()
+                                    if contract_detail_data.get('fin_year') == 2022 and contract_detail_data.get('fakt_trade_methods_id') in (2, 3, 60, 32):
+                                        while True:
+                                            try:
+                                                if contract_detail_data.get('trd_buy_number_anno'):
+                                                    lots_response = requests.get(LOTS_URL+contract_detail_data.get('trd_buy_number_anno'), params={'limit': 500, }, headers=headers, verify=False,)
+                                                    lots_data = lots_response.json()
+                                                    if lots_data.get('total') % lots_data.get('limit') == 0:
+                                                        lots_page_cnt = lots_data.get('total') // lots_data.get('limit')
+                                                    else:
+                                                        lots_page_cnt = lots_data.get('total') // lots_data.get(
+                                                            'limit') + 1
 
-                                                        for lots_page in range(1, lots_page_cnt):
-                                                            while True:
-                                                                try:
-                                                                    lots_response = requests.get(
-                                                                        LOTS_URL + contract_detail_data.get('trd_buy_number_anno'),
-                                                                        params={'limit': 500, 'page': lots_page}, headers=headers, verify=False, )
-                                                                    lots_data = lots_response.json()
-                                                                    for lot_data in lots_data.get('items'):
-                                                                        for plan_point in lot_data.get('point_list'):
-                                                                            while True:
-                                                                                try:
-                                                                                    plan_point_response = requests.get(
-                                                                                        PLAN_URL + plan_point, headers=headers,
-                                                                                        verify=False, )
-                                                                                    plan_point_data = plan_point_response.json()
+                                                    for lots_page in range(1, lots_page_cnt):
+                                                        while True:
+                                                            try:
+                                                                lots_response = requests.get(
+                                                                    LOTS_URL + contract_detail_data.get('trd_buy_number_anno'),
+                                                                    params={'limit': 500, 'page': lots_page}, headers=headers, verify=False, )
+                                                                lots_data = lots_response.json()
+                                                                for lot_data in lots_data.get('items'):
+                                                                    for plan_point in lot_data.get('point_list'):
+                                                                        while True:
+                                                                            try:
+                                                                                plan_point_response = requests.get(
+                                                                                    PLAN_URL + plan_point, headers=headers,
+                                                                                    verify=False, )
+                                                                                plan_point_data = plan_point_response.json()
+                                                                                if plan_point_data.get('ref_pln_point_status_id') == 9:
                                                                                     for kato in plan_point_data.get('kato'):
                                                                                         if kato.get('ref_kato_code')[:2] in ("71", "75") or kato.get('ref_kato_code')[
                                                                                                                                          :4] == "1170":
                                                                                             file_writer.writerow(
                                                                                                 [contract_detail_data.get('id'), contract_detail_data.get('trd_buy_id'),
                                                                                                  contract_detail_data.get('trd_buy_number_anno'),
-                                                                                                 contract_detail_data.get('ref_contract_status_id'),
+                                                                                                 'Закупка состоялась',
+                                                                                                 trade_methods.get(contract_detail_data.get('fakt_trade_methods_id')),
                                                                                                  contract_detail_data.get('supplier_id'),
                                                                                                  contract_detail_data.get('supplier_biin'),
                                                                                                  contract_detail_data.get('sign_reason_doc_name'),
@@ -129,7 +201,6 @@ try:
                                                                                                  contract_detail_data.get('ref_contract_type_id'),
                                                                                                  contract_detail_data.get('description_kz'),
                                                                                                  contract_detail_data.get('description_ru'),
-                                                                                                 contract_detail_data.get('fakt_trade_methods_id'),
                                                                                                  contract_detail_data.get('customer_legal_address'),
                                                                                                  lot_data.get('lot_number'), lot_data.get('name_ru'),
                                                                                                  lot_data.get('name_kz'), lot_data.get('description_ru'),
@@ -152,62 +223,52 @@ try:
                                                                                                  kato.get('full_delivery_place_name_kz'),
 
                                                                                                  ])
-                                                                                    break
-                                                                                except:
-                                                                                    time.sleep(5)
-                                                                                    print('plan_point_response: error')
-                                                                                    print('page: ', x)
-                                                                                    print('contract detail id: ', contract_detail_data.get('id'))
-                                                                                    print('contract detail number anno: ', contract_detail_data.get('trd_buy_number_anno'))
-                                                                                    print('lot number: ', lot_data.get('lot_number'))
-                                                                                    print('plan point id: ', plan_point_data.get('id'))
-                                                                    break
-                                                                except:
-                                                                    time.sleep(5)
-                                                                    print('lots_data_response: error')
-                                                                    print('page: ', x)
-                                                                    print('contract detail id: ',
-                                                                          contract_detail_data.get('id'))
-                                                                    print('contract detail number anno: ',
-                                                                          contract_detail_data.get('trd_buy_number_anno'))
-                                                                    print('lots page: ', lots_page)
-                                                    else:
-                                                        break
-                                                    break
-                                                except:
-                                                    time.sleep(5)
-                                                    print('lots_data_response: error')
-                                                    print('page: ', x)
-                                                    print('contract detail id: ',
-                                                          contract_detail_data.get('id'))
-                                                    print('contract detail number anno: ',
-                                                          contract_detail_data.get('trd_buy_number_anno'))
-                                                    print('lots page: ', lots_page)
-                                        else:
-                                            print('Год 2022 закончился')
-                                            print('page: ', x)
-                                            print('contract detail id: ',
-                                                  contract_detail_data.get('id'))
-                                            print('contract detail number anno: ',
-                                                  contract_detail_data.get('trd_buy_number_anno'))
-                                            year_2022 = False
-                                            break
-                                        break
-                                    except:
-                                        time.sleep(5)
-                                        print('contract_detail_response: error')
-                                        print('page: ', x)
-                                        print('contract detail id: ', contract_detail_data.get('id'))
-                                        print('contract detail number anno: ',
-                                              contract_detail_data.get('trd_buy_number_anno'))
-                            else:
-                                break
-                        break
-                    except:
-                        time.sleep(5)
-                        print('contracts_response: error')
-                        print('page: ', x)
-            else:
-                break
+                                                                                break
+                                                                            except Exception as err:
+                                                                                time.sleep(5)
+                                                                                print('plan_point_response: error')
+                                                                                print('page: ', x)
+                                                                                print('contract detail id: ', contract_detail_data.get('id'))
+                                                                                print('contract detail number anno: ', contract_detail_data.get('trd_buy_number_anno'))
+                                                                                print('lot number: ', lot_data.get('lot_number'))
+                                                                                print('plan point id: ', plan_point_data.get('id'))
+                                                                                print(err)
+                                                                break
+                                                            except Exception as err:
+                                                                time.sleep(5)
+                                                                print('lots_data_response: error')
+                                                                print('page: ', x)
+                                                                print('contract detail id: ',
+                                                                      contract_detail_data.get('id'))
+                                                                print('contract detail number anno: ',
+                                                                      contract_detail_data.get('trd_buy_number_anno'))
+                                                                print('lots page: ', lots_page)
+                                                                print(err)
+                                                break
+                                            except Exception as err:
+                                                time.sleep(5)
+                                                print('lots_data_response: error')
+                                                print('page: ', x)
+                                                print('contract detail id: ',
+                                                      contract_detail_data.get('id'))
+                                                print('contract detail number anno: ',
+                                                      contract_detail_data.get('trd_buy_number_anno'))
+                                                print('lots page: ', lots_page)
+                                                print(err)
+                                    break
+                                except Exception as err:
+                                    time.sleep(5)
+                                    print('contract_detail_response: error')
+                                    print('page: ', x)
+                                    print('contract detail id: ', contract_detail_data.get('id'))
+                                    print('contract detail number anno: ',
+                                          contract_detail_data.get('trd_buy_number_anno'))
+                                    print(err)
+                    break
+                except Exception as err:
+                    time.sleep(5)
+                    print('contracts_response: error')
+                    print('page: ', x)
+                    print(err)
 except Exception as err:
     print(err)
