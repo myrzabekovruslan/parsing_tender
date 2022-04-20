@@ -255,7 +255,7 @@ try:
                               'Описание на русском языке', 'Юридический адрес заказчика',
                               'Номер лота', 'Наименование на русском языке', 'Наименование на государственном языке',
                               'Детальное описание на русском языке', 'Детальное описание на государственном языке',
-                              'БИН заказчика', 'ИД пункта плана', 'Номер акта',
+                              'ИД пункта плана', 'Номер акта',
                               'Код способа закупки(плановый)', 'Код единицы измерения', 'Количество / объем',
                               'Цена за единицу', 'Общая сумма, утвержденная для закупки',
                               'Краткая характеристика на русском языке', 'Краткая характеристика на казахском языке',
@@ -279,7 +279,7 @@ try:
                                 lots_page_cnt = lots_data.get('total') // lots_data.get(
                                     'limit') + 1
 
-                            for lots_page in range(1, lots_page_cnt):
+                            for lots_page in range(1, lots_page_cnt+1):
                                 while True:
                                     try:
                                         lots_response = requests.get(
@@ -292,15 +292,118 @@ try:
                                                 while True:
                                                     try:
                                                         plan_point_response = requests.get(
-                                                            PLAN_URL + plan_point, headers=headers,
+                                                            PLAN_URL + str(plan_point), headers=headers,
                                                             verify=False, )
                                                         plan_point_data = plan_point_response.json()
                                                         if plan_point_data.get(
-                                                                'ref_pln_point_status_id') == 9:
+                                                                'ref_pln_point_status_id') == 9 and plan_point_data.get('kato'):
                                                             for kato in plan_point_data.get('kato'):
                                                                 if kato.get('ref_kato_code')[:2] in (
                                                                         "71", "75") or kato.get('ref_kato_code')[
                                                                                        :4] == "1170":
+                                                                    if contract.get(
+                                                                             'signReasonDocName'):
+                                                                        signReasonName = contract.get(
+                                                                             'signReasonDocName').strip()
+                                                                    else:
+                                                                        signReasonName = contract.get(
+                                                                             'signReasonDocName')
+
+                                                                    if contract.get(
+                                                                             'descriptionKz'):
+                                                                        desc_kz1 = contract.get(
+                                                                             'descriptionKz').strip()
+                                                                    else:
+                                                                        desc_kz1 = contract.get(
+                                                                             'descriptionKz')
+
+                                                                    if contract.get(
+                                                                             'descriptionRu'):
+                                                                        desc_ru1 = contract.get(
+                                                                             'descriptionRu').strip()
+                                                                    else:
+                                                                        desc_ru1 = contract.get(
+                                                                             'descriptionRu')
+
+                                                                    if contract.get(
+                                                                             'customerLegalAddress'):
+                                                                        customer_addr = contract.get(
+                                                                             'customerLegalAddress').strip()
+                                                                    else:
+                                                                        customer_addr = contract.get(
+                                                                             'customerLegalAddress')
+
+                                                                    if lot_data.get('name_ru'):
+                                                                        lot_name_ru = lot_data.get('name_ru').strip()
+                                                                    else:
+                                                                        lot_name_ru = lot_data.get('name_ru')
+
+                                                                    if lot_data.get('name_kz'):
+                                                                        lot_name_kz = lot_data.get('name_kz').strip()
+                                                                    else:
+                                                                        lot_name_kz = lot_data.get('name_kz')
+
+                                                                    if lot_data.get('description_ru'):
+                                                                        lot_desc_ru = lot_data.get('description_ru').strip()
+                                                                    else:
+                                                                        lot_desc_ru = lot_data.get('description_ru')
+
+                                                                    if lot_data.get('description_kz'):
+                                                                        lot_desc_kz = lot_data.get('description_kz').strip()
+                                                                    else:
+                                                                        lot_desc_kz = lot_data.get('description_kz')
+
+                                                                    if plan_point_data.get('desc_ru'):
+                                                                        desc_ru2 = plan_point_data.get('desc_ru').strip()
+                                                                    else:
+                                                                        desc_ru2 = plan_point_data.get('desc_ru')
+
+                                                                    if plan_point_data.get('desc_kz'):
+                                                                        desc_kz2 = plan_point_data.get('desc_kz').strip()
+                                                                    else:
+                                                                        desc_kz2 = plan_point_data.get('desc_kz')
+
+                                                                    if plan_point_data.get(
+                                                                             'extra_desc_ru'):
+                                                                        extra_desc_ru2 = plan_point_data.get(
+                                                                             'extra_desc_ru').strip()
+                                                                    else:
+                                                                        extra_desc_ru2 = plan_point_data.get(
+                                                                             'extra_desc_ru')
+
+                                                                    if plan_point_data.get(
+                                                                             'extra_desc_kz'):
+                                                                        extra_desc_kz2 = plan_point_data.get(
+                                                                             'extra_desc_kz').strip()
+                                                                    else:
+                                                                        extra_desc_kz2 = plan_point_data.get(
+                                                                             'extra_desc_ru')
+
+                                                                    if kato.get(
+                                                                             'full_delivery_place_name_ru'):
+                                                                        kato_ru = kato.get(
+                                                                             'full_delivery_place_name_ru').strip()
+                                                                    else:
+                                                                        kato_ru = kato.get(
+                                                                             'full_delivery_place_name_ru')
+
+                                                                    if kato.get(
+                                                                             'full_delivery_place_name_kz'):
+                                                                        kato_kz = kato.get(
+                                                                             'full_delivery_place_name_kz').strip()
+                                                                    else:
+                                                                        kato_kz = kato.get(
+                                                                             'full_delivery_place_name_kz')
+
+                                                                    if contract.get(
+                                                                            'RefContractYearType'):
+                                                                        contract_type = contract.get(
+                                                                            'RefContractYearType').get(
+                                                                            'nameRu')
+                                                                    else:
+                                                                        contract_type = contract.get(
+                                                                            'RefContractYearType')
+
                                                                     file_writer.writerow(
                                                                         [contract.get('id'),
                                                                          contract.get(
@@ -315,8 +418,7 @@ try:
                                                                              'supplierId'),
                                                                          contract.get(
                                                                              'supplierBiin'),
-                                                                         contract.get(
-                                                                             'signReasonDocName'),
+                                                                         signReasonName,
                                                                          contract.get(
                                                                              'signReasonDocDate'),
                                                                          contract.get(
@@ -331,8 +433,7 @@ try:
                                                                              'finYear'),
                                                                          contract.get(
                                                                              'refContractAgrFormId'),
-                                                                         contract.get(
-                                                                             'RefContractYearType').get('nameRu'),
+                                                                         contract_type,
                                                                          contract.get(
                                                                              'refCurrencyCode'),
                                                                          contract.get(
@@ -345,18 +446,14 @@ try:
                                                                              'faktSumWnds'),
                                                                          contract.get(
                                                                              'refContractTypeId'),
-                                                                         contract.get(
-                                                                             'descriptionKz'),
-                                                                         contract.get(
-                                                                             'descriptionRu'),
-                                                                         contract.get(
-                                                                             'customerLegalAddress'),
+                                                                         desc_kz1,
+                                                                         desc_ru1,
+                                                                         customer_addr,
                                                                          lot_data.get('lot_number'),
-                                                                         lot_data.get('name_ru'),
-                                                                         lot_data.get('name_kz'),
-                                                                         lot_data.get('description_ru'),
-                                                                         lot_data.get('description_kz'),
-                                                                         lot_data.get('customer_bin'),
+                                                                         lot_name_ru,
+                                                                         lot_name_kz,
+                                                                         lot_desc_ru,
+                                                                         lot_desc_kz,
                                                                          plan_point_data.get('id'),
                                                                          plan_point_data.get(
                                                                              'plan_act_number'),
@@ -367,17 +464,13 @@ try:
                                                                          plan_point_data.get('count'),
                                                                          plan_point_data.get('price'),
                                                                          plan_point_data.get('amount'),
-                                                                         plan_point_data.get('desc_ru'),
-                                                                         plan_point_data.get('desc_kz'),
-                                                                         plan_point_data.get(
-                                                                             'extra_desc_ru'),
-                                                                         plan_point_data.get(
-                                                                             'extra_desc_kz'),
+                                                                         desc_ru2,
+                                                                         desc_kz2,
+                                                                         extra_desc_ru2,
+                                                                         extra_desc_kz2,
                                                                          kato.get('ref_kato_code'),
-                                                                         kato.get(
-                                                                             'full_delivery_place_name_ru'),
-                                                                         kato.get(
-                                                                             'full_delivery_place_name_kz'),
+                                                                         kato_ru,
+                                                                         kato_kz,
 
                                                                          ])
                                                         break
@@ -391,7 +484,7 @@ try:
                                                               contract.get(
                                                                   'trdBuyNumberAnno'))
                                                         print('lot number: ', lot_data.get('lot_number'))
-                                                        print('plan point id: ', plan_point_data.get('id'))
+                                                        print('plan point id: ', plan_point)
                                                         print(err)
                                         break
                                     except Exception as err:
@@ -413,12 +506,11 @@ try:
                               contract.get('id'))
                         print('contract detail number anno: ',
                               contract.get('trdBuyNumberAnno'))
-                        print('lots page: ', lots_page)
                         print(err)
 
         last_id = data.get('extensions').get('pageInfo').get('lastId')
 
-        for x in range(2, contract_page_cnt+1):
+        for x in range(2, 3):
             while True:
                 try:
                     r = requests.post(
@@ -435,6 +527,7 @@ try:
                                                 id
                                                 nameRu
                                             }
+                                            supplierId
                                             supplierBiin
                                             signReasonDocName
                                             signReasonDocDate
@@ -444,6 +537,10 @@ try:
                                             contractNumberSys
                                             finYear
                                             refContractAgrFormId
+                                            RefContractYearType {
+                                                id
+                                                nameRu
+                                            }
                                             refCurrencyCode
                                             contractSum
                                             contractSumWnds
@@ -489,7 +586,7 @@ try:
                                             lots_page_cnt = lots_data.get('total') // lots_data.get(
                                                 'limit') + 1
 
-                                        for lots_page in range(1, lots_page_cnt):
+                                        for lots_page in range(1, lots_page_cnt + 1):
                                             while True:
                                                 try:
                                                     lots_response = requests.get(
@@ -502,16 +599,132 @@ try:
                                                             while True:
                                                                 try:
                                                                     plan_point_response = requests.get(
-                                                                        PLAN_URL + plan_point, headers=headers,
+                                                                        PLAN_URL + str(plan_point), headers=headers,
                                                                         verify=False, )
                                                                     plan_point_data = plan_point_response.json()
                                                                     if plan_point_data.get(
-                                                                            'ref_pln_point_status_id') == 9:
+                                                                            'ref_pln_point_status_id') == 9 and plan_point_data.get(
+                                                                        'kato'):
                                                                         for kato in plan_point_data.get('kato'):
                                                                             if kato.get('ref_kato_code')[:2] in (
                                                                                     "71", "75") or kato.get(
                                                                                 'ref_kato_code')[
                                                                                                    :4] == "1170":
+                                                                                if contract.get(
+                                                                                        'signReasonDocName'):
+                                                                                    signReasonName = contract.get(
+                                                                                        'signReasonDocName').strip()
+                                                                                else:
+                                                                                    signReasonName = contract.get(
+                                                                                        'signReasonDocName')
+
+                                                                                if contract.get(
+                                                                                        'descriptionKz'):
+                                                                                    desc_kz1 = contract.get(
+                                                                                        'descriptionKz').strip()
+                                                                                else:
+                                                                                    desc_kz1 = contract.get(
+                                                                                        'descriptionKz')
+
+                                                                                if contract.get(
+                                                                                        'descriptionRu'):
+                                                                                    desc_ru1 = contract.get(
+                                                                                        'descriptionRu').strip()
+                                                                                else:
+                                                                                    desc_ru1 = contract.get(
+                                                                                        'descriptionRu')
+
+                                                                                if contract.get(
+                                                                                        'customerLegalAddress'):
+                                                                                    customer_addr = contract.get(
+                                                                                        'customerLegalAddress').strip()
+                                                                                else:
+                                                                                    customer_addr = contract.get(
+                                                                                        'customerLegalAddress')
+
+                                                                                if lot_data.get('name_ru'):
+                                                                                    lot_name_ru = lot_data.get(
+                                                                                        'name_ru').strip()
+                                                                                else:
+                                                                                    lot_name_ru = lot_data.get(
+                                                                                        'name_ru')
+
+                                                                                if lot_data.get('name_kz'):
+                                                                                    lot_name_kz = lot_data.get(
+                                                                                        'name_kz').strip()
+                                                                                else:
+                                                                                    lot_name_kz = lot_data.get(
+                                                                                        'name_kz')
+
+                                                                                if lot_data.get('description_ru'):
+                                                                                    lot_desc_ru = lot_data.get(
+                                                                                        'description_ru').strip()
+                                                                                else:
+                                                                                    lot_desc_ru = lot_data.get(
+                                                                                        'description_ru')
+
+                                                                                if lot_data.get('description_kz'):
+                                                                                    lot_desc_kz = lot_data.get(
+                                                                                        'description_kz').strip()
+                                                                                else:
+                                                                                    lot_desc_kz = lot_data.get(
+                                                                                        'description_kz')
+
+                                                                                if plan_point_data.get('desc_ru'):
+                                                                                    desc_ru2 = plan_point_data.get(
+                                                                                        'desc_ru').strip()
+                                                                                else:
+                                                                                    desc_ru2 = plan_point_data.get(
+                                                                                        'desc_ru')
+
+                                                                                if plan_point_data.get('desc_kz'):
+                                                                                    desc_kz2 = plan_point_data.get(
+                                                                                        'desc_kz').strip()
+                                                                                else:
+                                                                                    desc_kz2 = plan_point_data.get(
+                                                                                        'desc_kz')
+
+                                                                                if plan_point_data.get(
+                                                                                        'extra_desc_ru'):
+                                                                                    extra_desc_ru2 = plan_point_data.get(
+                                                                                        'extra_desc_ru').strip()
+                                                                                else:
+                                                                                    extra_desc_ru2 = plan_point_data.get(
+                                                                                        'extra_desc_ru')
+
+                                                                                if plan_point_data.get(
+                                                                                        'extra_desc_kz'):
+                                                                                    extra_desc_kz2 = plan_point_data.get(
+                                                                                        'extra_desc_kz').strip()
+                                                                                else:
+                                                                                    extra_desc_kz2 = plan_point_data.get(
+                                                                                        'extra_desc_ru')
+
+                                                                                if kato.get(
+                                                                                        'full_delivery_place_name_ru'):
+                                                                                    kato_ru = kato.get(
+                                                                                        'full_delivery_place_name_ru').strip()
+                                                                                else:
+                                                                                    kato_ru = kato.get(
+                                                                                        'full_delivery_place_name_ru')
+
+                                                                                if kato.get(
+                                                                                        'full_delivery_place_name_kz'):
+                                                                                    kato_kz = kato.get(
+                                                                                        'full_delivery_place_name_kz').strip()
+                                                                                else:
+                                                                                    kato_kz = kato.get(
+                                                                                        'full_delivery_place_name_kz')
+
+                                                                                if contract.get(
+                                                                                         'RefContractYearType'):
+                                                                                    contract_type = contract.get(
+                                                                                         'RefContractYearType').get(
+                                                                                         'nameRu')
+                                                                                else:
+                                                                                    contract_type = contract.get(
+                                                                                         'RefContractYearType')
+
                                                                                 file_writer.writerow(
                                                                                     [contract.get('id'),
                                                                                      contract.get(
@@ -527,8 +740,7 @@ try:
                                                                                          'supplierId'),
                                                                                      contract.get(
                                                                                          'supplierBiin'),
-                                                                                     contract.get(
-                                                                                         'signReasonDocName'),
+                                                                                     signReasonName,
                                                                                      contract.get(
                                                                                          'signReasonDocDate'),
                                                                                      contract.get(
@@ -543,9 +755,7 @@ try:
                                                                                          'finYear'),
                                                                                      contract.get(
                                                                                          'refContractAgrFormId'),
-                                                                                     contract.get(
-                                                                                         'RefContractYearType').get(
-                                                                                         'nameRu'),
+                                                                                     contract_type,
                                                                                      contract.get(
                                                                                          'refCurrencyCode'),
                                                                                      contract.get(
@@ -558,18 +768,14 @@ try:
                                                                                          'faktSumWnds'),
                                                                                      contract.get(
                                                                                          'refContractTypeId'),
-                                                                                     contract.get(
-                                                                                         'descriptionKz'),
-                                                                                     contract.get(
-                                                                                         'descriptionRu'),
-                                                                                     contract.get(
-                                                                                         'customerLegalAddress'),
+                                                                                     desc_kz1,
+                                                                                     desc_ru1,
+                                                                                     customer_addr,
                                                                                      lot_data.get('lot_number'),
-                                                                                     lot_data.get('name_ru'),
-                                                                                     lot_data.get('name_kz'),
-                                                                                     lot_data.get('description_ru'),
-                                                                                     lot_data.get('description_kz'),
-                                                                                     lot_data.get('customer_bin'),
+                                                                                     lot_name_ru,
+                                                                                     lot_name_kz,
+                                                                                     lot_desc_ru,
+                                                                                     lot_desc_kz,
                                                                                      plan_point_data.get('id'),
                                                                                      plan_point_data.get(
                                                                                          'plan_act_number'),
@@ -580,17 +786,13 @@ try:
                                                                                      plan_point_data.get('count'),
                                                                                      plan_point_data.get('price'),
                                                                                      plan_point_data.get('amount'),
-                                                                                     plan_point_data.get('desc_ru'),
-                                                                                     plan_point_data.get('desc_kz'),
-                                                                                     plan_point_data.get(
-                                                                                         'extra_desc_ru'),
-                                                                                     plan_point_data.get(
-                                                                                         'extra_desc_kz'),
+                                                                                     desc_ru2,
+                                                                                     desc_kz2,
+                                                                                     extra_desc_ru2,
+                                                                                     extra_desc_kz2,
                                                                                      kato.get('ref_kato_code'),
-                                                                                     kato.get(
-                                                                                         'full_delivery_place_name_ru'),
-                                                                                     kato.get(
-                                                                                         'full_delivery_place_name_kz'),
+                                                                                     kato_ru,
+                                                                                     kato_kz,
 
                                                                                      ])
                                                                     break
@@ -604,7 +806,7 @@ try:
                                                                           contract.get(
                                                                               'trdBuyNumberAnno'))
                                                                     print('lot number: ', lot_data.get('lot_number'))
-                                                                    print('plan point id: ', plan_point_data.get('id'))
+                                                                    print('plan point id: ', plan_point)
                                                                     print(err)
                                                     break
                                                 except Exception as err:
@@ -626,7 +828,6 @@ try:
                                           contract.get('id'))
                                     print('contract detail number anno: ',
                                           contract.get('trdBuyNumberAnno'))
-                                    print('lots page: ', lots_page)
                                     print(err)
 
                     break
