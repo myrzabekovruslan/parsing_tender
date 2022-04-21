@@ -12,6 +12,8 @@ plans_URL = "https://ows.goszakup.gov.kz/v3/plans/all"
 PLAN_URL = "https://ows.goszakup.gov.kz/v3/plans/view/"
 bin_URL = "https://ows.goszakup.gov.kz/v3/subject/biin/"
 LOTS_URL = "https://ows.goszakup.gov.kz/v3/lots/number-anno/"
+TRADE_METHODS_URL = "https://ows.goszakup.gov.kz/v3/refs/ref_trade_methods"
+UNITS_CODE_URL = "https://ows.goszakup.gov.kz/v3/refs/ref_units"
 
 headers = dict()
 headers["Authorization"] = "Bearer 3eaae6dd49f1ab32c1421c9db58a3a59"
@@ -55,6 +57,19 @@ exclude_bin = {
     '030440003698',
     '180740010700',
 }
+
+
+response = requests.get(TRADE_METHODS_URL, headers=headers, verify=False, params={'limit': 500, })
+data = response.json()
+TRADE_METHODS_CODES = dict()
+for i in data.get('items'):
+    TRADE_METHODS_CODES[i.get('id')] = i.get('name_ru')
+
+response = requests.get(UNITS_CODE_URL, headers=headers, verify=False, params={'limit': 500, })
+data = response.json()
+UNITS_CODES = dict()
+for i in data.get('items'):
+    UNITS_CODES[i.get('code')] = i.get('name_ru')
 
 # try:
 #     r = requests.post(
@@ -256,7 +271,7 @@ try:
                               'Номер лота', 'Наименование на русском языке', 'Наименование на государственном языке',
                               'Детальное описание на русском языке', 'Детальное описание на государственном языке',
                               'ИД пункта плана', 'Номер акта',
-                              'Код способа закупки(плановый)', 'Код единицы измерения', 'Количество / объем',
+                              'Способа закупки(плановый)', 'Единицы измерения', 'Количество / объем',
                               'Цена за единицу', 'Общая сумма, утвержденная для закупки',
                               'Краткая характеристика на русском языке', 'Краткая характеристика на казахском языке',
                               'Дополнительное описание на русском языке', 'Дополнительное описание на казахском языке',
@@ -457,10 +472,10 @@ try:
                                                                          plan_point_data.get('id'),
                                                                          plan_point_data.get(
                                                                              'plan_act_number'),
-                                                                         plan_point_data.get(
-                                                                             'ref_trade_methods_id'),
-                                                                         plan_point_data.get(
-                                                                             'ref_units_code'),
+                                                                         TRADE_METHODS_CODES.get(plan_point_data.get(
+                                                                             'ref_trade_methods_id')),
+                                                                         UNITS_CODES.get(plan_point_data.get(
+                                                                             'ref_units_code')),
                                                                          plan_point_data.get('count'),
                                                                          plan_point_data.get('price'),
                                                                          plan_point_data.get('amount'),
@@ -510,7 +525,7 @@ try:
 
         last_id = data.get('extensions').get('pageInfo').get('lastId')
 
-        for x in range(2, 3):
+        for x in range(2, contract_page_cnt+1):
             while True:
                 try:
                     r = requests.post(
@@ -779,10 +794,12 @@ try:
                                                                                      plan_point_data.get('id'),
                                                                                      plan_point_data.get(
                                                                                          'plan_act_number'),
-                                                                                     plan_point_data.get(
-                                                                                         'ref_trade_methods_id'),
-                                                                                     plan_point_data.get(
-                                                                                         'ref_units_code'),
+                                                                                     TRADE_METHODS_CODES.get(
+                                                                                         plan_point_data.get(
+                                                                                             'ref_trade_methods_id')),
+                                                                                     UNITS_CODES.get(
+                                                                                         plan_point_data.get(
+                                                                                             'ref_units_code')),
                                                                                      plan_point_data.get('count'),
                                                                                      plan_point_data.get('price'),
                                                                                      plan_point_data.get('amount'),
