@@ -16,7 +16,7 @@ TRADE_METHODS_URL = "https://ows.goszakup.gov.kz/v3/refs/ref_trade_methods"
 UNITS_CODE_URL = "https://ows.goszakup.gov.kz/v3/refs/ref_units"
 
 headers = dict()
-headers["Authorization"] = "Bearer 3eaae6dd49f1ab32c1421c9db58a3a59"
+headers["Authorization"] = "Bearer dbc38bf745fd37a65e012c7f58e5bbdd"
 headers[
     "User-Agent"] = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.3 Safari/605.1.15"
 headers["Content-Type"] = "application/json"
@@ -64,6 +64,7 @@ data = response.json()
 TRADE_METHODS_CODES = dict()
 for i in data.get('items'):
     TRADE_METHODS_CODES[i.get('id')] = i.get('name_ru')
+
 
 response = requests.get(UNITS_CODE_URL, headers=headers, verify=False, params={'limit': 500, })
 data = response.json()
@@ -525,7 +526,7 @@ try:
 
         last_id = data.get('extensions').get('pageInfo').get('lastId')
 
-        for x in range(2, contract_page_cnt+1):
+        for x in range(2, 290):
             while True:
                 try:
                     r = requests.post(
